@@ -11,22 +11,30 @@
 #' shijuan_fenxi(data,ques_cols=2:5,fenZhi=c(10,20,30,40))
 #' data2 = file.path(system.file(package = "glantools"),"test2.xlsx")
 #' shijuan_fenxi(data2,ques_cols=2:5,fenZhi=c(30,15,30,25))
+#'
+
 
 shijuan_fenxi <- function(file,ques_cols=2:5,fenZhi,sheetname=1){
   #install neccesary packages
   if (!"ggplot2" %in% installed.packages()) install.packages("ggplot2")
   if (!"tidyr" %in% installed.packages()) install.packages("tidyr")
   if (!"ggrepel" %in% installed.packages()) install.packages("ggrepel")
+  if (!"readxl" %in% installed.packages()) install.packages("readxl")
+
   suppressWarnings(suppressPackageStartupMessages({
     library(ggplot2)
     library(tidyr)
     library(ggrepel)
+    library(readxl)
   }))
 
   # read data
-  data <- xlsx::read.xlsx(file,sheetname,startRow = 2,header = FALSE)
+  ##data <- xlsx::read.xlsx(file,sheetname,startRow = 2,header = FALSE)
+  data <- read_excel(file,sheetname,col_names = FALSE,skip=1)
+  data <- as.data.frame(data)
+  tcol <- dim(data)[2]
 
-  data_cut <- cut(data$X6,breaks = c(0,59,69,79,89,100),labels=c("0-59","60-69","70-79","80-89","90-100"))
+  data_cut <- cut(as.numeric(data[,tcol]),breaks = c(0,59,69,79,89,100),labels=c("0-59","60-69","70-79","80-89","90-100"))
   numbers <-table(data_cut)
   options(digits = 3)
   percentage <- round(table(data_cut)/nrow(data)*100,2)
@@ -47,11 +55,11 @@ shijuan_fenxi <- function(file,ques_cols=2:5,fenZhi,sheetname=1){
 
   ## 总体分析
   ## 标准差
-  tcol <- dim(data)[2]
+
   sd <- sd(data[,tcol])
 
   ## 阿尔法信度
-  ## alhpa = 题数/(题数-1)*(1-各题方差之和)/总分方差
+  ## alhpa = 题数/(题数-1)*(1-各题方差之和/总分方差)
   varcovar <- var(data[,ques_cols])
   #var_sum <- sum(var(data$X2),var(data$X3),var(data$X4),var(data$X5))
   var_sum <- sum(diag(varcovar))
