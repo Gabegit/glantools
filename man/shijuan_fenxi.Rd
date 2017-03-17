@@ -26,6 +26,7 @@ data = file.path(system.file(package = "glantools"),"test.xlsx")
 shijuan_fenxi(data,ques_cols=2:5,fenZhi=c(10,20,30,40))
 data2 = file.path(system.file(package = "glantools"),"test2.xlsx")
 shijuan_fenxi(data2,ques_cols=2:5,fenZhi=c(30,15,30,25))
+
 }
 \author{
 lgm
